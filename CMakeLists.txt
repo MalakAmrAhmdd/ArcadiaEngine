@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCES
     ArcadiaEngine.cpp
-    main.cpp
+    main_test_student.cpp
 )
 
 set(HEADERS
