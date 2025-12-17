@@ -99,7 +99,24 @@ void test_PartA_DataStructures() {
         if (top.size() < 2) return false;
         return (top[0] == 10 && top[1] == 20); 
     }());
-    
+
+    // New Test: Removal and Addition should update TopN accordingly
+    runner.runTest("Leaderboard: Remove and Add -> TopN updates", [&]() {
+        Leaderboard* board2 = createLeaderboard();
+        // initial insertions
+        board2->addScore(1, 100);
+        board2->addScore(2, 200);
+        board2->addScore(3, 150);
+        // remove current top (player 2)
+        board2->removePlayer(2);
+        // add a new higher score
+        board2->addScore(4, 250);
+        vector<int> top = board2->getTopN(3);
+        bool ok = (top.size() >= 3 && top[0] == 4 && top[1] == 3 && top[2] == 1);
+        delete board2;
+        return ok;
+    }());
+
     delete board;
 
     // 3. AuctionTree (Red-Black Tree)

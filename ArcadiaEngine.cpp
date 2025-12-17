@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <random>
 #include <map>
 #include <set>
 #define ll long long
@@ -111,28 +112,150 @@ public:
 
 // --- 2. Leaderboard (Skip List) ---
 
+
 class ConcreteLeaderboard : public Leaderboard {
-private:
     // TODO: Define your skip list node structure and necessary variables
     // Hint: You'll need nodes with multiple forward pointers
+
+private:
+    // Expected no. of players is 101, so max no. of levels is log(100) = 10
+    const int levels = 11;
+    struct Node {
+        vector <Node*> forward;
+        int level;
+        int playerID;
+        int score;
+        string playerName;
+
+        Node() : forward(vector<Node*> (11)), level(0), playerID(0), playerName("") {}
+    };
+
+    Node* head;
+    int currLevel;
+
+
 
 public:
     ConcreteLeaderboard() {
         // TODO: Initialize your skip list
+        head = new Node();
+        currLevel = 0;
     }
 
-    void addScore(int playerID, int score) override {
-        // TODO: Implement skip list insertion
-        // Remember to maintain descending order by score
+    // Return greatest score node but smaller than the one we're searching for
+    Node* searchByScore(int playerID, int score) {
+        Node* trav = head;
+
+        for (int lvl = currLevel; lvl >= 0; lvl--) {
+
+            while (trav->forward[lvl] != NULL) {
+
+                Node* next = trav->forward[lvl];
+
+                // Case 1: Next score is greater → keep moving (descending order)
+                if (next->score > score) {
+                    trav = next;
+                }
+                // Case 2: Same score: check ID ascending
+                else if (next->score == score && next->playerID < playerID) {
+                    trav = next;
+                }
+                // Case 3: next should not be passed → stop
+                else {
+                    break;
+                }
+            }
+        }
+
+        return trav;
     }
+
+    void insertUpperLevels(Node* newNode) {
+
+        int playerID = newNode->playerID;
+        int score = newNode->score;
+        int nodeLevel = newNode->level;
+
+        for (int lvl = 1; lvl <= nodeLevel; lvl++) {
+
+            Node* trav = head;
+
+            while (trav->forward[lvl] != NULL &&
+                  (trav->forward[lvl]->score > score ||
+                  (trav->forward[lvl]->score == score && trav->forward[lvl]->playerID < playerID))) {
+
+                trav = trav->forward[lvl];
+                  }
+
+            newNode->forward[lvl] = trav->forward[lvl];
+            trav->forward[lvl] = newNode;
+        }
+    }
+
+
+    void addScore(int playerID, int score) override {
+
+        // Level 0 predecessor
+        Node* prev = searchByScore(playerID, score);
+
+        Node* newNode = new Node();
+        newNode->playerID = playerID;
+        newNode->score = score;
+
+        // Random height
+        int nodeLevel = 0;
+        int random = random_device{}() % 2;
+        while ((random & 1) && nodeLevel < levels - 1) nodeLevel++;
+        newNode->level = nodeLevel;
+
+        // Insert at level 0
+        newNode->forward[0] = prev->forward[0];
+        prev->forward[0] = newNode;
+
+        // Update skip list max level
+        if (nodeLevel > currLevel)
+            currLevel = nodeLevel;
+
+        // Insert higher levels using helper
+        insertUpperLevels(newNode);
+    }
+
 
     void removePlayer(int playerID) override {
         // TODO: Implement skip list deletion
+        Node* curr = head;
+        while (curr->forward[0] != NULL) {
+            curr = curr->forward[0];
+            if (curr->playerID == playerID) break;
+        }
+
+        for (int lvl = 0; lvl <= curr->level; lvl++) {
+            Node* trav = head;
+            while (trav->forward[lvl] != NULL && trav->forward[lvl] != curr) {
+                trav = trav->forward[lvl];
+            }
+            if (trav->forward[lvl] == curr) {
+                trav->forward[lvl] = curr->forward[lvl];
+            }
+        }
+
+        while (currLevel > 0 && head->forward[currLevel] == nullptr)
+            currLevel--;
+
+        delete curr;
     }
 
     vector<int> getTopN(int n) override {
         // TODO: Return top N player IDs in descending score order
-        return {};
+        Node* first = head;
+
+        vector<int> result;
+        for (int i = 0; i < n; i++) {
+            if (first->forward[0] == NULL) break;
+            result.push_back(first->forward[0]->playerID);
+            first = first->forward[0];
+        }
+        return result;
     }
 };
 
