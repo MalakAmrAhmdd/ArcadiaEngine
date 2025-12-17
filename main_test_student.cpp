@@ -127,11 +127,20 @@ void test_PartB_Inventory() {
         return InventorySystem::optimizeLootSplit(3, coins) == 1;
     }());
 
+    runner.runTest("LootSplit: {1, 5, 11, 5} -> Diff 0", [&]() {
+        vector<int> coins = {1, 5, 11, 5};
+        return InventorySystem::optimizeLootSplit(4, coins) == 0;
+    }());
+
     // 2. Inventory Packer (Knapsack)
     // PDF Example: Cap=10, Items={{1,10}, {2,20}, {3,30}}. All fit. Value=60.
     runner.runTest("Knapsack: Cap 10, All Fit -> Value 60", [&]() {
         vector<pair<int, int>> items = {{1, 10}, {2, 20}, {3, 30}};
         return InventorySystem::maximizeCarryValue(10, items) == 60;
+    }());
+    runner.runTest("Knapsack: Cap 5, All Fit -> Value 55", [&]() {
+        vector<pair<int, int>> items = {{1,10}, {2,15}, {3,40}};
+        return InventorySystem::maximizeCarryValue(5, items) == 55;
     }());
 
     // 3. Chat Autocorrect (String DP)
@@ -139,6 +148,16 @@ void test_PartB_Inventory() {
     runner.runTest("ChatDecorder: 'uu' -> 2 Possibilities", [&]() {
         return InventorySystem::countStringPossibilities("uu") == 2;
     }());
+
+
+    runner.runTest("ChatDecorder: 'uuuu' -> 5 Possibilities", [&]() {
+        return InventorySystem::countStringPossibilities("uuuu") == 5;
+    }());
+
+    runner.runTest("ChatDecorder: 'uunn' -> 4 Possibilities", [&]() {
+        return InventorySystem::countStringPossibilities("uunn") == 4;
+    }());
+
 }
 
 // ==========================================

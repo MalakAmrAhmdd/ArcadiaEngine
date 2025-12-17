@@ -13,6 +13,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#define ll long long
 
 using namespace std;
 
@@ -437,22 +438,65 @@ int InventorySystem::optimizeLootSplit(int n, vector<int>& coins) {
     // TODO: Implement partition problem using DP
     // Goal: Minimize |sum(subset1) - sum(subset2)|
     // Hint: Use subset sum DP to find closest sum to total/2
-    return 0;
+    int s = 0;
+    for(int coin : coins) s += coin;
+    int target = s / 2;
+
+    vector<bool> dp(target + 1, false);
+    dp[0] = true;
+    for (int coin : coins) {
+        for (int j = target; j >= coin; j--) {
+            if (dp[j - coin]) {
+                dp[j] = true;
+            }
+        }
+    }
+    for (int i = target; i >= 0; i--) {
+        if (dp[i]) {
+            return s - 2 * i;
+        }
+    }
+    return s;
 }
 
 int InventorySystem::maximizeCarryValue(int capacity, vector<pair<int, int>>& items) {
     // TODO: Implement 0/1 Knapsack using DP
     // items = {weight, value} pairs
     // Return maximum value achievable within capacity
-    return 0;
+    vector<int> dp(capacity + 1, 0);
+    for (const auto& item : items) {
+        int weight = item.first;
+        int value = item.second;
+        for (int w = capacity; w >= weight; w--) {
+            dp[w] = max(dp[w], dp[w - weight] + value);
+        }
+    }
+    return dp[capacity];
 }
-
+static const long long MOD = 1e9 + 7;
 long long InventorySystem::countStringPossibilities(string s) {
     // TODO: Implement string decoding DP
     // Rules: "uu" can be decoded as "w" or "uu"
     //        "nn" can be decoded as "m" or "nn"
     // Count total possible decodings
-    return 0;
+
+    int n = s.size();
+    vector<long long> dp(n + 1, 0);
+    dp[0] = 1; // Empty string
+    dp[1] = 1; // Single character
+
+    for (int i = 2; i <= n ; ++i) {
+        dp[i] = dp[i - 1]; // 2
+        if(s[i - 1] == 'u' && s[i - 2] == 'u') {
+            dp[i] = (dp[i] + dp[i - 2]) % MOD;
+        }
+        if(s[i - 1] == 'n' && s[i - 2] == 'n') {
+            dp[i] = (dp[i] + dp[i - 2]) % MOD;
+        }
+        dp[i] %= MOD;
+    }
+    return dp[n];
+
 }
 
 // =========================================================
