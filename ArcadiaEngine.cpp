@@ -120,7 +120,7 @@ class ConcreteLeaderboard : public Leaderboard {
 
 private:
     // Expected no. of players is 101, so max no. of levels is log(100) = 10
-    const int levels = 11;
+    const int levels = 20;
     struct Node {
         vector <Node*> forward;
         int level;
@@ -128,7 +128,7 @@ private:
         int score;
         string playerName;
 
-        Node() : forward(vector<Node*> (11)), level(0), playerID(0), playerName("") {}
+        Node() : forward(vector<Node*> (20)), level(0), playerID(0), playerName("") {}
     };
     int size = 0;
     Node* head;
@@ -861,16 +861,16 @@ int ServerKernel::minIntervals(vector<char>& tasks, int n) {
 // =========================================================
 
 extern "C" {
-    PlayerTable* createPlayerTable() { 
-        return new ConcretePlayerTable(); 
+    PlayerTable* createPlayerTable() {
+        return new ConcretePlayerTable();
     }
 
-    Leaderboard* createLeaderboard() { 
-        return new ConcreteLeaderboard(); 
+    Leaderboard* createLeaderboard() {
+        return new ConcreteLeaderboard();
     }
 
-    AuctionTree* createAuctionTree() { 
-        return new ConcreteAuctionTree(); 
+    AuctionTree* createAuctionTree() {
+        return new ConcreteAuctionTree();
     }
 }
 
