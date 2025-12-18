@@ -603,6 +603,11 @@ long long InventorySystem::countStringPossibilities(string s) {
     //        "nn" can be decoded as "m" or "nn"
     // Count total possible decodings
 
+    for (char c : s) {
+        if (c == 'w' || c == 'm')
+            return 0;
+    }
+
     int n = s.size();
     vector<long long> dp(n + 1, 0);
     dp[0] = 1; // Empty string
@@ -658,7 +663,30 @@ int ServerKernel::minIntervals(vector<char>& tasks, int n) {
     // Same task must wait 'n' intervals before running again
     // Return minimum total intervals needed (including idle time)
     // Hint: Use greedy approach with frequency counting
-    return 0;
+
+    // this solution is O(n)
+    vector<int> count(26, 0);
+    for (int i = 0; i < tasks.size(); i++) {
+        count[tasks[i] - 'A']++;
+    }
+
+    int max = 0;
+    for (int i = 0; i < 26; i++) {
+        if (count[i] > max) max = count[i];
+    }
+
+    int rep = -1;
+    for (int i = 0; i < 26; i++) {
+        if (count[i] == max) rep++;
+    }
+
+    int res = count[0] + (count[0] - 1) * n;
+    res += rep;
+
+    if (max == 1 || n == 0) res = tasks.size();
+    if (tasks.empty()) res = 0;
+
+    return res;
 }
 
 // =========================================================
