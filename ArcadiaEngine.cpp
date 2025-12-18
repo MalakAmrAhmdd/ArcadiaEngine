@@ -14,6 +14,7 @@
 #include <random>
 #include <map>
 #include <set>
+#include <bitset>
 #define ll long long
 
 using namespace std;
@@ -82,7 +83,7 @@ public:
         }
 
         // Table is full
-        cout << "Table is full" << endl;
+        cout << "Table is Full" << endl;
     }
 
     string search(int playerID) override {
@@ -618,8 +619,8 @@ long long InventorySystem::countStringPossibilities(string s) {
 
     int n = s.size();
     vector<long long> dp(n + 1, 0);
-    dp[0] = 1; // Empty string
-    dp[1] = 1; // Single character
+    dp[0] = 1;
+    if (n >= 1) dp[1] = 1;
 
     for (int i = 2; i <= n ; ++i) {
         dp[i] = dp[i - 1]; // 2
@@ -642,6 +643,52 @@ long long InventorySystem::countStringPossibilities(string s) {
 bool WorldNavigator::pathExists(int n, vector<vector<int>>& edges, int source, int dest) {
     // TODO: Implement path existence check using BFS or DFS
     // edges are bidirectional
+    // Edge case: if n = 0, no cities exist
+    if (n == 0) return false;
+    
+    // Edge case: check if source and dest are within valid bounds (0 to n-1)
+    if (source < 0 || source >= n || dest < 0 || dest >= n) {
+        return false;
+    }
+    
+    // Edge case: if source and dest are the same
+    if (source == dest) return true;
+
+    // Build adjacency list from edges
+    vector<vector<int>> adj(n);
+    for (const auto& edge : edges) {
+        int u = edge[0];
+        int v = edge[1];
+        // Bidirectional edges
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    
+    // BFS to find if path exists
+    vector<bool> visited(n, false);
+    queue<int> q;
+
+    q.push(source);
+    visited[source] = true;
+
+    while (!q.empty()) {
+        int current = q.front();
+        q.pop();
+        
+        // Check if we reached destination
+        if (current == dest) {
+            return true;
+        }
+        
+        // Visit all neighbors
+        for (int neighbor : adj[current]) {
+            if (!visited[neighbor]) {
+                visited[neighbor] = true;
+                q.push(neighbor);
+            }
+        }
+    }
+
     return false;
 }
 
@@ -651,6 +698,62 @@ long long WorldNavigator::minBribeCost(int n, int m, long long goldRate, long lo
     // roadData[i] = {u, v, goldCost, silverCost}
     // Total cost = goldCost * goldRate + silverCost * silverRate
     // Return -1 if graph cannot be fully connected
+
+    // Edge case: if n = 0 or n = 1, no roads needed
+    if (n <= 1) return 0;
+    
+    // Edge case: if m = 0 and n > 1, cannot connect graph
+    if (m == 0) return -1;
+    
+    // Build adjacency list
+    vector<vector<pair<int, long long>>> adj(n);
+
+    for (const auto& road : roadData) {
+        int u = road[0];
+        int v = road[1];
+        long long goldCost = road[2];
+        long long silverCost = road[3];
+        
+        long long totalCost = goldCost * goldRate + silverCost * silverRate;
+        
+        adj[u].push_back({v, totalCost});
+        adj[v].push_back({u, totalCost});
+    }
+
+    // Prim's Algorithm using priority queue
+    vector<bool> inMST(n, false);
+    priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> pq;
+    
+    // Start from city 0
+    pq.push({0, 0});
+    
+    long long totalBribeCost = 0;
+    int citiesAdded = 0;
+
+    while (!pq.empty()) {
+        auto [cost, u] = pq.top();
+        pq.pop();
+        
+        // Skip if already in MST
+        if (inMST[u]) continue;
+        
+        // Add to MST
+        inMST[u] = true;
+        totalBribeCost += cost;
+        citiesAdded++;
+        
+        // If all cities added, return result
+        if (citiesAdded == n) {
+            return totalBribeCost;
+        }
+        
+        // Add all edges from u to priority queue
+        for (const auto& [v, edgeCost] : adj[u]) {
+            if (!inMST[v]) {
+                pq.push({edgeCost, v});
+            }
+        }
+    }
     return -1;
 }
 
@@ -659,7 +762,60 @@ string WorldNavigator::sumMinDistancesBinary(int n, vector<vector<int>>& roads) 
     // Sum all shortest distances between unique pairs (i < j)
     // Return the sum as a binary string
     // Hint: Handle large numbers carefully
-    return "0";
+    
+    // Edge case: if n = 0 or n = 1, no pairs exist
+    if (n <= 1) return "0";
+    
+    // Initialize distance matrix
+    const long long INF = 1e18;
+    vector<vector<long long>> dist(n, vector<long long>(n, INF));
+    
+    for (int i = 0; i < n; i++) {
+        dist[i][i] = 0;
+    }
+    
+    // Fill initial distances
+    for (const auto& road : roads) {
+        int u = road[0];
+        int v = road[1];
+        long long weight = road[2];
+        
+        dist[u][v] = min(dist[u][v], weight);
+        dist[v][u] = min(dist[v][u], weight);
+    }
+
+    // Floyd-Warshall
+    for (int k = 0; k < n; k++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (dist[i][k] != INF && dist[k][j] != INF) {
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+    }
+
+    // Sum all shortest distances
+    unsigned long long totalSum = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (dist[i][j] != INF) {
+                totalSum += dist[i][j];
+            }
+        }
+    }
+
+    // Convert to binary using bitset or manual conversion
+    if (totalSum == 0) return "0";
+    
+    string binary = "";
+    unsigned long long num = totalSum;
+    while (num > 0) {
+        binary = char('0' + (num & 1)) + binary;
+        num >>= 1;
+    }
+    
+    return binary;
 }
 
 // =========================================================

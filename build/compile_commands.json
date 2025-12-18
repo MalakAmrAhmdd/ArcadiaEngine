@@ -1,0 +1,14 @@
+[
+{
+  "directory": "C:/Users/DELL/Documents/GitHub/ArcadiaEngine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\ArcadiaEngine.dir\\ArcadiaEngine.cpp.obj -c C:\\Users\\DELL\\Documents\\GitHub\\ArcadiaEngine\\ArcadiaEngine.cpp",
+  "file": "C:/Users/DELL/Documents/GitHub/ArcadiaEngine/ArcadiaEngine.cpp",
+  "output": "CMakeFiles/ArcadiaEngine.dir/ArcadiaEngine.cpp.obj"
+},
+{
+  "directory": "C:/Users/DELL/Documents/GitHub/ArcadiaEngine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\ArcadiaEngine.dir\\main_test_student.cpp.obj -c C:\\Users\\DELL\\Documents\\GitHub\\ArcadiaEngine\\main_test_student.cpp",
+  "file": "C:/Users/DELL/Documents/GitHub/ArcadiaEngine/main_test_student.cpp",
+  "output": "CMakeFiles/ArcadiaEngine.dir/main_test_student.cpp.obj"
+}
+]

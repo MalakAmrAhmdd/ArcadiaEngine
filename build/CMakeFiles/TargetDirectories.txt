@@ -1,0 +1,3 @@
+C:/Users/DELL/Documents/GitHub/ArcadiaEngine/build/CMakeFiles/ArcadiaEngine.dir
+C:/Users/DELL/Documents/GitHub/ArcadiaEngine/build/CMakeFiles/edit_cache.dir
+C:/Users/DELL/Documents/GitHub/ArcadiaEngine/build/CMakeFiles/rebuild_cache.dir
