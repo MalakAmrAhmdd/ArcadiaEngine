@@ -52,8 +52,8 @@ private:
     }
 
 public:
-    ConcretePlayerTable() {
-        table.resize(TABLE_SIZE);
+    ConcretePlayerTable() : table(TABLE_SIZE){
+        
     }
 
     void insert(int playerID, string name) override {
@@ -765,7 +765,7 @@ string WorldNavigator::sumMinDistancesBinary(int n, vector<vector<int>>& roads) 
     // Sum all shortest distances between unique pairs (i < j)
     // Return the sum as a binary string
     // Hint: Handle large numbers carefully
-    
+
     // Edge case: if n = 0 or n = 1, no pairs exist
     if (n <= 1) return "0";
     
