@@ -237,6 +237,9 @@ public:
             if (curr->playerID == playerID) break;
         }
 
+        // removing a non-existing player
+        if (curr->playerID != playerID) return;
+
         for (int lvl = 0; lvl <= curr->level; lvl++) {
             Node* trav = head;
             while (trav->forward[lvl] != NULL && trav->forward[lvl] != curr) {
