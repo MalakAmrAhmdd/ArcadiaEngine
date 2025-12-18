@@ -6,7 +6,6 @@
 #include <functional>
 #include "ArcadiaEngine.h"
 #include <algorithm>
-
 using namespace std;
 /*
     BY : Folka
@@ -137,7 +136,45 @@ void test_PartA_DataStructures() {
         if (top.size() != 3) return false;
         return (top[0] == 20 && top[1] == 2 && top[2] == 1);
     }());
-    
+    runner.runTest("Leaderboard: erasing 1e3 un-exist players", [&]() {
+        int n = 1e3;
+        for(int i = 1; i <= n; i++) {
+            board->removePlayer(i);
+        }
+        return true;
+    }());
+    runner.runTest("Leaderboard: insert 1e5 players", [&]() {
+        int n = 1e5;
+        auto score = [](int i) -> int {
+            return i / 2 + 1;
+        };
+        vector< int > exp;
+        for(int i = 1; i <= n; i++) {
+            board->addScore(i, score(i));
+            exp.push_back(i);
+        }
+        sort(exp.begin(), exp.end(), [&](int i, int j) {
+           if(score(i) != score(j)) {
+               return score(i) > score(j);
+           }
+            return i < j;
+        });
+        vector< int > top = board->getTopN(n);
+        for(int i = 0; i < top.size(); i++) {
+            if(top[i] != exp[i]) {
+                cout << i << ' ' << top[i] << ' ' << exp[i] << endl;
+            }
+        }
+        return top == exp;
+    }());
+    runner.runTest("Leaderboard: erasing 1e3 players", [&]() {
+        int n = 1e5;
+        for(int i = 1; i <= n; i += 99) {
+            board->removePlayer(i);
+        }
+        return true;
+    }());
+
     delete board;
 
     // 3. AuctionTree (Red-Black Tree)
@@ -222,12 +259,24 @@ void test_PartB_Inventory() {
         return InventorySystem::countStringPossibilities("uu") == 2;
     }());
 
+    runner.runTest("ChatDecorder: 'uua' -> 2 Possibilities", [&]() {
+        return InventorySystem::countStringPossibilities("uua") == 2;
+    }());
+
     runner.runTest("ChatDecorder: '' -> 1 Possibilities", [&]() {
         return InventorySystem::countStringPossibilities("") == 1;
     }());
 
     runner.runTest("ChatDecorder: 'm' -> 0 Possibilities", [&]() {
         return InventorySystem::countStringPossibilities("m") == 0;
+    }());
+
+    runner.runTest("ChatDecorder: 'w' -> 0 Possibilities", [&]() {
+       return InventorySystem::countStringPossibilities("w") == 0;
+    }());
+
+    runner.runTest("ChatDecorder: 'uuaw' -> 0 Possibilities", [&]() {
+        return InventorySystem::countStringPossibilities("uuaw") == 0;
     }());
 
     runner.runTest("ChatDecoder: 'uunn' -> 4 Possibilities", [&]() {
