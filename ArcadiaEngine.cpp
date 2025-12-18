@@ -129,20 +129,13 @@ private:
 
         Node() : forward(vector<Node*> (11)), level(0), playerID(0), playerName("") {}
     };
-
+    int size = 0;
     Node* head;
     int currLevel;
 
+    // Helper functions
 
-
-public:
-    ConcreteLeaderboard() {
-        // TODO: Initialize your skip list
-        head = new Node();
-        currLevel = 0;
-    }
-
-    // Return greatest score node but smaller than the one we're searching for
+    // Return greatest score node but smaller than the one we're searching for (predecesor)
     Node* searchByScore(int playerID, int score) {
         Node* trav = head;
 
@@ -160,7 +153,6 @@ public:
                 else if (next->score == score && next->playerID < playerID) {
                     trav = next;
                 }
-                // Case 3: next should not be passed → stop
                 else {
                     break;
                 }
@@ -169,6 +161,7 @@ public:
 
         return trav;
     }
+
 
     void insertUpperLevels(Node* newNode) {
 
@@ -193,16 +186,29 @@ public:
     }
 
 
-    void addScore(int playerID, int score) override {
+public:
+    ConcreteLeaderboard() {
+        // TODO: Initialize your skip list
+        head = new Node();
+        currLevel = 0;
+    }
 
+    void addScore(int playerID, int score) override {
         // Level 0 predecessor
         Node* prev = searchByScore(playerID, score);
+
+        // Check if node exists at level 0
+        Node* exists = prev->forward[0];
+        if (exists && exists->playerID == playerID) {
+            exists->score = score;
+            return;
+        }
+
 
         Node* newNode = new Node();
         newNode->playerID = playerID;
         newNode->score = score;
 
-        // Random height
         int nodeLevel = 0;
         int random = random_device{}() % 2;
         while ((random & 1) && nodeLevel < levels - 1) nodeLevel++;
@@ -211,12 +217,13 @@ public:
         // Insert at level 0
         newNode->forward[0] = prev->forward[0];
         prev->forward[0] = newNode;
+        size++;
 
         // Update skip list max level
         if (nodeLevel > currLevel)
             currLevel = nodeLevel;
 
-        // Insert higher levels using helper
+        // Insert at higher levels
         insertUpperLevels(newNode);
     }
 
@@ -250,7 +257,8 @@ public:
         Node* first = head;
 
         vector<int> result;
-        for (int i = 0; i < n; i++) {
+        // Handle case: N more than size of leaderboard
+        for (int i = 0; i < min(n, size); i++) {
             if (first->forward[0] == NULL) break;
             result.push_back(first->forward[0]->playerID);
             first = first->forward[0];
